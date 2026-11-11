@@ -110,8 +110,18 @@ body {
 body[data-touch="menu"] .dpad .left,
 body[data-touch="menu"] .dpad .right,
 body[data-touch="platform"] .dpad .up,
-body[data-touch="platform"] .dpad .down {
+body[data-touch="platform"] .dpad .down,
+body[data-touch="board"] .action {
     visibility: hidden;
+}
+
+/* Board games are tapped directly: keep only pause, bottom-left, away from the board. */
+body[data-touch="board"] .dpad {
+    display: none;
+}
+
+body[data-touch="board"] .touch {
+    justify-content: flex-start;
 }
 
 @media (pointer: coarse) {

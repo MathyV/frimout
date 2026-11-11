@@ -7,13 +7,15 @@
 //                         is already scaled to the same 480x270 units
 //   pausable              true while gameplay runs; the shell then opens its
 //                         pause menu on Esc, otherwise Esc returns to the menu
-//   touchLayout           which on-screen buttons to show: "platform" | "fps" | "menu"
+//   touchLayout           which on-screen buttons to show:
+//                         "platform" | "fps" | "menu" | "board" (pause only; the game is tapped directly)
 //   onPause() / onResume()
 //   dispose()             release listeners, music, pointer lock
 //
 // shell provides: input, sound, canvas, exit() (back to the menu) and pause().
 import { createJourney } from "./journey/index.js";
 import { createLockdown } from "./lockdown/index.js";
+import { createPayload } from "./payload/index.js";
 
 export const GAMES = [
     {
@@ -37,5 +39,16 @@ export const GAMES = [
             "your repair zapper and save the data.",
         ],
         create: createLockdown,
+    },
+    {
+        id: "payload",
+        title: "Payload Swap",
+        genre: "Match-3 puzzle",
+        description: [
+            "Swap hop cones, waffles, Earths and more",
+            "to load the payload, mission by mission",
+            "along the STS-45 flight.",
+        ],
+        create: createPayload,
     },
 ];

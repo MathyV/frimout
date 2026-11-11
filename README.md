@@ -20,6 +20,10 @@ Five chapters following his path:
 
 A fictional training run in an orbital-lab simulator, presented as fiction in the game itself. The lab's maintenance robots have glitched; switch them off with a repair zapper (three hits each), recover the data disks and reach the green exit hatch. Three decks, sliding doors, Belgian waffles for health and energy cells for the zapper. It is an original raycaster in the first-person genre, not a remake of any existing game.
 
+### Payload Swap (match-3 puzzle)
+
+Swap neighbouring tiles to line up three or more: hop cones, Belgian waffles, Earths, Suns, floppy disks and astronaut helmets. Four in a row makes a **rocket** that clears its row or column; five makes a **solar flare** that wipes out every tile of the type you swap it with. Eight missions follow the STS-45 flight, each with a move limit, a score target and tiles to collect, and earn 1 to 3 stars. Finishing a mission unlocks the next.
+
 ## Controls
 
 | Action | Keyboard | Gamepad | Touch |
@@ -45,7 +49,15 @@ A fictional training run in an orbital-lab simulator, presented as fiction in th
 | Strafe | A D | LB RB | |
 | Zap | Space / Ctrl / F / left click | A / RT | A |
 
-Progress (furthest chapter or deck reached per game), the last selected game and the sound setting are stored in the browser's local storage.
+**Payload Swap**
+
+| Action | Keyboard / mouse | Gamepad | Touch |
+| --- | --- | --- | --- |
+| Swap | Drag a tile, or click two neighbours | | Swipe a tile, or tap two neighbours |
+| Cursor swap | Arrows move, Space grabs, then an arrow swaps | D-pad, A grabs | |
+| Back to mission list after a loss | Backspace | B | |
+
+Progress (furthest chapter or deck reached, best stars per Payload Swap mission), the last selected game and the sound setting are stored in the browser's local storage.
 
 ## Running locally
 
@@ -57,7 +69,7 @@ npm run serve
 
 Then open http://localhost:8000.
 
-URL parameters open a game directly: `?game=journey&chapter=N` (1 to 5) or `?game=lockdown&map=N` (1 to 3). The older `?chapter=N` links still open Journey to the Stars.
+URL parameters open a game directly: `?game=journey&chapter=N` (1 to 5), `?game=lockdown&map=N` (1 to 3) or `?game=payload&mission=N` (1 to 8). The older `?chapter=N` links still open Journey to the Stars.
 
 ## Level checks
 
@@ -67,6 +79,7 @@ npm run check
 
 - `tools/check-journey.js` loads every platformer level with the game's real player physics and explores, breadth-first, every place the player can stand by simulating a fan of jump and steering inputs. It fails if the goal, any collectible or any checkpoint is unreachable. Enemies are ignored and steam vents are treated as passable, since both can be waited out. Add `--map` (`node tools/check-journey.js --map`) to print a failing level with the reachable standing spots marked `*`.
 - `tools/check-lockdown.js` parses every Lab Lockdown map (row lengths, tiles, door orientation) and checks that the exit, every pickup and every robot can be reached on foot.
+- `tools/check-payload.js` plays every Payload Swap mission 200 times (seeded, so results are reproducible) with a bot that looks one move ahead using the game's own rules. It reports the bot's win rate and winning-score percentiles, and fails if any mission drops below a 35% bot win rate. The bot is weaker than a careful player, so treat its numbers as a floor. Pass a run count to change the sample: `node tools/check-payload.js 500`.
 
 The GitHub Pages workflow runs these checks before every deploy.
 
@@ -102,9 +115,13 @@ At normal gravity the player clears about 3 tiles up and 4 tiles across; in orbi
 
 In both games every row of a map must be the same length. Run `npm run check` after every change.
 
+### Payload Swap: `js/games/payload/missions.js`
+
+Each mission sets `moves`, a score `target`, `collect` (tile type to count: 0 hop cone, 1 waffle, 2 Earth, 3 Sun, 4 floppy disk, 5 helmet) and `stars` (`[target, 2-star score, 3-star score]`). The current numbers were tuned with the checker: bot win rates fall from about 85% for the first mission to about 50% for the last, the 2-star score is the bot's median winning score and the 3-star score its 80th percentile. Rerun the checker after changing a mission and adjust from its output.
+
 ## Adding a game
 
-Register it in `js/games/index.js`. A game is a `create(shell, params)` factory returning an object with `update(dt)`, `drawPixels(ctx)` (480x270 pixel canvas), `drawOverlay(ctx)` (full-resolution text layer in the same units), `pausable`, `touchLayout` (`"platform"`, `"fps"` or `"menu"`), `onPause()`, `onResume()` and `dispose()`. The shell provides `input`, `sound`, `canvas`, `exit()` and `pause()`; the comment at the top of `js/games/index.js` documents the contract.
+Register it in `js/games/index.js`. A game is a `create(shell, params)` factory returning an object with `update(dt)`, `drawPixels(ctx)` (480x270 pixel canvas), `drawOverlay(ctx)` (full-resolution text layer in the same units), `pausable`, `touchLayout` (`"platform"`, `"fps"`, `"menu"` or `"board"`), `onPause()`, `onResume()` and `dispose()`. The shell provides `input`, `sound`, `canvas`, `exit()` and `pause()`; the comment at the top of `js/games/index.js` documents the contract.
 
 ## Deploying to GitHub Pages
 
@@ -124,8 +141,10 @@ js/core/                   shared: input, bindings, audio, text, sprites, storag
 js/games/index.js          game registry and the game contract
 js/games/journey/          Journey to the Stars (platformer)
 js/games/lockdown/         Frimout 3D: Lab Lockdown (raycaster, maps, textures)
+js/games/payload/          Payload Swap (board logic, turn rules, missions, tile art)
 tools/check-journey.js     platformer reachability checker
 tools/check-lockdown.js    Lab Lockdown map checker
+tools/check-payload.js     Payload Swap mission balance checker
 ```
 
 ## Sources
@@ -140,4 +159,4 @@ The code is released under the [MIT License](LICENSE).
 
 ## Disclaimer
 
-This is a fan-made tribute. It is not affiliated with or endorsed by Dirk Frimout, NASA or ESA. Lab Lockdown's story is fiction. All graphics and sounds are generated in code; the font is [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (SIL Open Font License), loaded from Google Fonts.
+This is a fan-made tribute. It is not affiliated with or endorsed by Dirk Frimout, NASA or ESA. Lab Lockdown's story is fiction. All three games are original designs within their genres. All graphics and sounds are generated in code; the font is [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (SIL Open Font License), loaded from Google Fonts.

@@ -115,8 +115,35 @@ export class Sound {
         notes.forEach((n, i) => this.note(master, type, freq(n), t + i * stepLen, stepLen * 1.5, volume));
     }
 
-    play(name) {
+    // level: optional intensity (e.g. cascade depth) for sounds that use it.
+    play(name, level = 0) {
         switch (name) {
+            case "swap":
+                this.sweep("triangle", 330, 520, 0.08, 0.15);
+                break;
+            case "invalid":
+                this.arpeggio([-5, -8], 0.07, "square", 0.12);
+                break;
+            case "match": {
+                const base = 7 + Math.min(level, 8) * 2;
+                this.arpeggio([base, base + 4, base + 7], 0.045, "triangle", 0.25);
+                break;
+            }
+            case "rocket":
+                this.sweep("sawtooth", 200, 1600, 0.35, 0.18);
+                break;
+            case "flare":
+                this.sweep("sine", 120, 1800, 0.6, 0.3);
+                break;
+            case "shuffle":
+                this.arpeggio([0, 3, 7, 3, 0], 0.05, "triangle", 0.15);
+                break;
+            case "win":
+                this.arpeggio([0, 4, 7, 12, 16, 19, 24], 0.08, "square", 0.16);
+                break;
+            case "lose":
+                this.arpeggio([7, 3, 0, -5], 0.15, "triangle", 0.25);
+                break;
             case "jump":
                 this.sweep("square", 280, 620, 0.12, 0.15);
                 break;

@@ -6,7 +6,7 @@
     "description": "Frimout Arcade: browser mini-games paying tribute to Dirk Frimout, the first Belgian in space.",
     "type": "module",
     "scripts": {
-        "check": "node tools/check-journey.js && node tools/check-lockdown.js",
+        "check": "node tools/check-journey.js && node tools/check-lockdown.js && node tools/check-payload.js",
         "serve": "python3 -m http.server 8000"
     }
 }
