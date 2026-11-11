@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "private": true,
     "license": "MIT",
-    "description": "Frimout: Journey to the Stars. A browser platform game paying tribute to Dirk Frimout, the first Belgian in space.",
+    "description": "Frimout Arcade: browser mini-games paying tribute to Dirk Frimout, the first Belgian in space.",
     "type": "module",
     "scripts": {
-        "check": "node tools/check-levels.js",
+        "check": "node tools/check-journey.js && node tools/check-lockdown.js",
         "serve": "python3 -m http.server 8000"
     }
 }

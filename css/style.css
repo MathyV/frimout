@@ -45,11 +45,35 @@ body {
     position: absolute;
     inset: auto 0 0 0;
     justify-content: space-between;
+    align-items: flex-end;
     padding: 0 16px max(16px, env(safe-area-inset-bottom));
     pointer-events: none;
 }
 
-.touch-group {
+.dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 56px);
+    grid-template-rows: repeat(3, 56px);
+    gap: 4px;
+}
+
+.dpad .up {
+    grid-area: 1 / 2;
+}
+
+.dpad .left {
+    grid-area: 2 / 1;
+}
+
+.dpad .right {
+    grid-area: 2 / 3;
+}
+
+.dpad .down {
+    grid-area: 3 / 2;
+}
+
+.actions {
     display: flex;
     align-items: flex-end;
     gap: 12px;
@@ -57,17 +81,17 @@ body {
 
 .touch button {
     pointer-events: auto;
-    width: 64px;
-    height: 64px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     border: 2px solid var(--button-border);
     background: var(--button);
     color: #ffffff;
-    font-size: 22px;
+    font-size: 20px;
     touch-action: none;
 }
 
-.touch button.jump {
+.touch button.action {
     width: 76px;
     height: 76px;
 }
@@ -80,6 +104,14 @@ body {
 
 .touch button.active {
     background: var(--button-active);
+}
+
+/* Which buttons each context needs */
+body[data-touch="menu"] .dpad .left,
+body[data-touch="menu"] .dpad .right,
+body[data-touch="platform"] .dpad .up,
+body[data-touch="platform"] .dpad .down {
+    visibility: hidden;
 }
 
 @media (pointer: coarse) {

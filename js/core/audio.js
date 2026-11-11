@@ -1,23 +1,20 @@
-// Synthesised sound effects and a small looping chiptune. Nothing is loaded
-// from disk; everything is generated with the Web Audio API.
+// Synthesised sound effects and looping chiptunes. Nothing is loaded from
+// disk; everything is generated with the Web Audio API.
+import { readStorage, writeStorage } from "./storage.js";
 
 const MUTE_KEY = "frimout.muted";
 
-// Melody in semitones relative to A4; null is a rest. One step is an eighth note.
-const LEAD = [
-    0, null, 4, 7, 12, null, 7, 4, 5, null, 9, 12, 9, null, 5, null,
-    7, null, 11, 14, 12, null, 11, 7, 9, 7, 5, 4, 2, null, null, null,
-];
-const BASS = [-24, -24, -17, -17, -19, -19, -12, -12, -20, -20, -13, -13, -17, -17, -22, -22];
+// A song is a lead line (one step per eighth note) and a bass line (one step
+// per quarter note), in semitones relative to A4; null is a rest.
+//   { tempo, lead: (number|null)[], bass: (number|null)[], leadWave?: OscillatorType }
 
 export class Sound {
     constructor() {
         this.ctx = null;
         this.master = null;
         this.musicGain = null;
-        this.muted = readMuted();
-        this.musicOn = false;
-        this.tempo = 140;
+        this.muted = readStorage(MUTE_KEY, "0") === "1";
+        this.song = null;
         this.step = 0;
         this.nextTime = 0;
         this.timer = null;
@@ -42,41 +39,41 @@ export class Sound {
 
     toggleMute() {
         this.muted = !this.muted;
-        try {
-            localStorage.setItem(MUTE_KEY, this.muted ? "1" : "0");
-        } catch {
-            // Storage may be unavailable (private mode); muting still works for this session.
-        }
+        writeStorage(MUTE_KEY, this.muted ? "1" : "0");
         if (this.master && this.ctx) this.master.gain.setTargetAtTime(this.muted ? 0 : 0.5, this.ctx.currentTime, 0.02);
         return this.muted;
     }
 
-    startMusic(tempo) {
-        this.tempo = tempo;
-        if (!this.ctx || this.musicOn) return;
-        this.musicOn = true;
+    startMusic(song) {
+        if (!this.ctx) return;
+        if (this.song === song && this.timer !== null) return;
+        this.stopMusic();
+        this.song = song;
         this.step = 0;
         this.nextTime = this.ctx.currentTime + 0.05;
         this.timer = window.setInterval(() => this.schedule(), 25);
     }
 
     stopMusic() {
-        this.musicOn = false;
         if (this.timer !== null) window.clearInterval(this.timer);
         this.timer = null;
+        this.song = null;
     }
 
     schedule() {
-        if (!this.ctx || !this.musicGain) return;
-        const stepLen = 60 / this.tempo / 2;
+        const song = this.song;
+        if (!this.ctx || !this.musicGain || !song) return;
+        const stepLen = 60 / song.tempo / 2;
         while (this.nextTime < this.ctx.currentTime + 0.12) {
-            const lead = LEAD[this.step % LEAD.length];
+            const lead = song.lead[this.step % song.lead.length];
             if (lead !== null && lead !== undefined) {
-                this.note(this.musicGain, "square", freq(lead), this.nextTime, stepLen * 0.9, 0.12);
+                this.note(this.musicGain, song.leadWave ?? "square", freq(lead), this.nextTime, stepLen * 0.9, 0.12);
             }
             if (this.step % 2 === 0) {
-                const bass = BASS[(this.step / 2) % BASS.length];
-                if (bass !== undefined) this.note(this.musicGain, "triangle", freq(bass), this.nextTime, stepLen * 1.8, 0.35);
+                const bass = song.bass[(this.step / 2) % song.bass.length];
+                if (bass !== null && bass !== undefined) {
+                    this.note(this.musicGain, "triangle", freq(bass), this.nextTime, stepLen * 1.8, 0.35);
+                }
             }
             this.nextTime += stepLen;
             this.step++;
@@ -113,8 +110,9 @@ export class Sound {
 
     arpeggio(notes, stepLen, type = "square", volume = 0.2) {
         if (!this.ctx || !this.master) return;
+        const master = this.master;
         const t = this.ctx.currentTime;
-        notes.forEach((n, i) => this.note(this.master, type, freq(n), t + i * stepLen, stepLen * 1.5, volume));
+        notes.forEach((n, i) => this.note(master, type, freq(n), t + i * stepLen, stepLen * 1.5, volume));
     }
 
     play(name) {
@@ -143,6 +141,30 @@ export class Sound {
             case "select":
                 this.sweep("square", 500, 800, 0.08, 0.12);
                 break;
+            case "zap":
+                this.sweep("sawtooth", 1400, 300, 0.14, 0.14);
+                break;
+            case "empty":
+                this.sweep("square", 160, 120, 0.06, 0.1);
+                break;
+            case "hit":
+                this.sweep("square", 700, 350, 0.08, 0.18);
+                break;
+            case "robotDown":
+                this.sweep("sawtooth", 600, 40, 0.6, 0.25);
+                break;
+            case "robotShot":
+                this.sweep("triangle", 900, 500, 0.12, 0.15);
+                break;
+            case "hurt":
+                this.sweep("square", 220, 90, 0.2, 0.28);
+                break;
+            case "door":
+                this.sweep("triangle", 120, 220, 0.35, 0.2);
+                break;
+            case "alert":
+                this.arpeggio([7, 7], 0.08, "square", 0.12);
+                break;
             default:
                 throw new Error(`Unknown sound "${name}"`);
         }
@@ -151,12 +173,4 @@ export class Sound {
 
 function freq(semitonesFromA4) {
     return 440 * Math.pow(2, semitonesFromA4 / 12);
-}
-
-function readMuted() {
-    try {
-        return localStorage.getItem(MUTE_KEY) === "1";
-    } catch {
-        return false;
-    }
 }

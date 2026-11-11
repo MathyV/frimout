@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <title>Frimout: Journey to the Stars</title>
-        <meta name="description" content="A browser platform game paying tribute to Dirk Frimout, the first Belgian in space (STS-45, 1992)." />
+        <title>Frimout Arcade</title>
+        <meta name="description" content="Browser mini-games paying tribute to Dirk Frimout, the first Belgian in space (STS-45, 1992)." />
         <meta name="theme-color" content="#02030a" />
         <link rel="icon" href="favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,21 +12,23 @@
         <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="css/style.css" />
     </head>
-    <body>
+    <body data-touch="menu">
         <main class="stage">
-            <canvas id="game" width="480" height="270" aria-label="Frimout: Journey to the Stars game"></canvas>
+            <canvas id="game" width="480" height="270" aria-label="Frimout Arcade"></canvas>
             <div class="touch" aria-hidden="true">
-                <div class="touch-group">
-                    <button type="button" data-action="left">&#9664;</button>
-                    <button type="button" data-action="right">&#9654;</button>
+                <div class="dpad">
+                    <button type="button" class="up" data-code="TouchUp">&#9650;</button>
+                    <button type="button" class="left" data-code="TouchLeft">&#9664;</button>
+                    <button type="button" class="right" data-code="TouchRight">&#9654;</button>
+                    <button type="button" class="down" data-code="TouchDown">&#9660;</button>
                 </div>
-                <div class="touch-group">
-                    <button type="button" class="small" data-action="pause">II</button>
-                    <button type="button" class="jump" data-action="jump">&#9650;</button>
+                <div class="actions">
+                    <button type="button" class="small" data-code="TouchPause">II</button>
+                    <button type="button" class="action" data-code="TouchA">A</button>
                 </div>
             </div>
         </main>
-        <noscript>This game needs JavaScript.</noscript>
+        <noscript>These games need JavaScript.</noscript>
         <script type="module" src="js/main.js"></script>
     </body>
 </html>

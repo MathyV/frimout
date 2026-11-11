@@ -1,11 +1,11 @@
-// Verifies every level is completable using the real player physics.
-// Explores standing positions breadth-first, simulating a fan of jump and
-// steering inputs from each. Enemies are ignored and vents are treated as
-// passable, because both are timing-dependent and can be waited out.
-import { LEVELS } from "../js/levels.js";
-import { World, TILE, overlaps } from "../js/world.js";
-import { Player, physicsFor, PLAYER_W, PLAYER_H } from "../js/player.js";
-import { spawnEntities } from "../js/entities.js";
+// Verifies every Journey to the Stars level is completable using the real
+// player physics. Explores standing positions breadth-first, simulating a fan
+// of jump and steering inputs from each. Enemies are ignored and vents are
+// treated as passable, because both are timing-dependent and can be waited out.
+import { LEVELS } from "../js/games/journey/levels.js";
+import { World, TILE, overlaps } from "../js/games/journey/world.js";
+import { Player, physicsFor, PLAYER_W, PLAYER_H } from "../js/games/journey/player.js";
+import { spawnEntities } from "../js/games/journey/entities.js";
 
 const DT = 1 / 60;
 const MAX_FRAMES = 300;

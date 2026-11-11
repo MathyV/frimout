@@ -1,8 +1,5 @@
 import { TILE, VENT_PERIOD, VENT_ACTIVE, VENT_HEIGHT } from "./world.js";
-
-export const VIEW_W = 480;
-export const VIEW_H = 270;
-export const FONT = '"Press Start 2P", ui-monospace, monospace';
+import { VIEW_W, VIEW_H } from "../../core/screen.js";
 
 export const THEMES = {
     village: {
@@ -634,16 +631,6 @@ function drawDebris(ctx, x, y, t) {
     ctx.fillRect(-5, -2, 4, 4);
     ctx.fillRect(1, -2, 4, 4);
     ctx.restore();
-}
-
-export function drawText(ctx, text, x, y, size, color, align = "left") {
-    ctx.font = `${size}px ${FONT}`;
-    ctx.textAlign = align;
-    ctx.textBaseline = "top";
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.fillText(text, x + 1, y + 1);
-    ctx.fillStyle = color;
-    ctx.fillText(text, x, y);
 }
 
 // Shuttle stack (side view) for the launch cutscene; (x, y) is the base centre.
